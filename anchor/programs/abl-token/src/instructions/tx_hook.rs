@@ -7,11 +7,17 @@ use crate::{ABListError, ABWallet, Mode};
 
 #[derive(Accounts)]
 pub struct TxHook<'info> {
+    /// CHECK: 
     pub source_token_account: UncheckedAccount<'info>,
+    /// CHECK: 
     pub mint: UncheckedAccount<'info>,
+    /// CHECK: 
     pub destination_token_account: UncheckedAccount<'info>,
+    /// CHECK: 
     pub owner_delegate: UncheckedAccount<'info>,
+    /// CHECK: 
     pub meta_list: UncheckedAccount<'info>,
+    /// CHECK: 
     pub ab_wallet: UncheckedAccount<'info>,
 }
 
@@ -24,20 +30,23 @@ impl<'info> TxHook<'info> {
         let metadata = mint.get_variable_len_extension::<TokenMetadata>()?;
         let decoded_mode = Self::decode_metadata(&metadata)?;
         let decoded_wallet_mode = Self::decode_wallet_mode(&self)?;
-        
+
         match (decoded_mode, decoded_wallet_mode) {
+            // first check the force allow modes
             (DecodedMintMode::Allow, DecodedWalletMode::Allow) => {
                 return Ok(());
             }
             (DecodedMintMode::Allow, _) => {
                 return Err(ABListError::WalletNotAllowed.into());
             }
+            // then check if the wallet is blocked
             (_, DecodedWalletMode::Block) => {
                 return Err(ABListError::WalletBlocked.into());
             }
             (DecodedMintMode::Block, _) => {
                 return Ok(());
             }
+            // lastly check the threshold mode
             (DecodedMintMode::Threshold(threshold), DecodedWalletMode::None) if amount >= threshold => {
                 return Err(ABListError::AmountNotAllowed.into());
             }

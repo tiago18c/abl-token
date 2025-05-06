@@ -13,7 +13,7 @@ pub use errors::*;
 declare_id!("JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H");
 
 #[program]
-pub mod basic {
+pub mod abl_token {
 
     use super::*;
 

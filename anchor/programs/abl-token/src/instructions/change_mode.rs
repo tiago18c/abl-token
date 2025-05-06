@@ -16,7 +16,7 @@ pub struct ChangeMode<'info> {
         has_one = authority,
     )]
     pub config: Box<Account<'info, Config>>,
-
+    /// CHECK: 
     pub mint: UncheckedAccount<'info>,
 
     pub token_program: Program<'info, Token2022>,

@@ -1,22 +1,22 @@
 // Here we export some useful types and functions for interacting with the Anchor program.
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { Cluster, PublicKey } from '@solana/web3.js'
-import BasicIDL from '../target/idl/basic.json'
-import type { Basic } from '../target/types/basic'
+import ABLTokenIDL from '../target/idl/abl_token.json'
+import type { AblToken } from '../target/types/abl_token'
 
 // Re-export the generated IDL and type
-export { Basic, BasicIDL }
+export { ABLTokenIDL }
 
 // The programId is imported from the program IDL.
-export const BASIC_PROGRAM_ID = new PublicKey(BasicIDL.address)
+export const ABL_TOKEN_PROGRAM_ID = new PublicKey(ABLTokenIDL.address)
 
 // This is a helper function to get the Basic Anchor program.
-export function getBasicProgram(provider: AnchorProvider, address?: PublicKey): Program<Basic> {
-  return new Program({ ...BasicIDL, address: address ? address.toBase58() : BasicIDL.address } as Basic, provider)
+export function getABLTokenProgram(provider: AnchorProvider, address?: PublicKey): Program<AblToken> {
+  return new Program({ ...ABLTokenIDL, address: address ? address.toBase58() : ABLTokenIDL.address } as AblToken, provider)
 }
 
 // This is a helper function to get the program ID for the Basic program depending on the cluster.
-export function getBasicProgramId(cluster: Cluster) {
+export function getABLTokenProgramId(cluster: Cluster) {
   switch (cluster) {
     case 'devnet':
     case 'testnet':
@@ -24,6 +24,6 @@ export function getBasicProgramId(cluster: Cluster) {
       return new PublicKey('6z68wfurCMYkZG51s1Et9BJEd9nJGUusjHXNt4dGbNNF')
     case 'mainnet-beta':
     default:
-      return BASIC_PROGRAM_ID
+      return ABL_TOKEN_PROGRAM_ID
   }
 }
