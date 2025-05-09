@@ -17,8 +17,8 @@ pub mod abl_token {
 
     use super::*;
 
-    pub fn init_mint(ctx: Context<Initialize>, args: InitializeMintArgs) -> Result<()> {
-        ctx.accounts.init_mint(args)
+    pub fn init_mint(ctx: Context<InitMint>, args: InitMintArgs) -> Result<()> {
+        ctx.accounts.init_mint(args, ctx.bumps.config)
     }
 
     #[instruction(discriminator = ExecuteInstruction::SPL_DISCRIMINATOR_SLICE)]
@@ -38,5 +38,3 @@ pub mod abl_token {
         ctx.accounts.change_mode(args)
     }
 }
-
-

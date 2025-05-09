@@ -114,6 +114,42 @@ export type AblToken = {
           }
         },
         {
+          "name": "extraMetasAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  114,
+                  97,
+                  45,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  45,
+                  109,
+                  101,
+                  116,
+                  97,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
@@ -127,7 +163,7 @@ export type AblToken = {
           "name": "args",
           "type": {
             "defined": {
-              "name": "initializeMintArgs"
+              "name": "initMintArgs"
             }
           }
         }
@@ -411,19 +447,7 @@ export type AblToken = {
       }
     },
     {
-      "name": "initWalletArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "allowed",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "initializeMintArgs",
+      "name": "initMintArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -454,6 +478,18 @@ export type AblToken = {
           {
             "name": "threshold",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "initWalletArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "allowed",
+            "type": "bool"
           }
         ]
       }

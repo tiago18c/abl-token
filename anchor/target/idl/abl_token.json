@@ -1,5 +1,5 @@
 {
-  "address": "LtkoMwPSKxAE714EY3V1oAEQ5LciqJcRwQQuQnzEhQQ",
+  "address": "JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H",
   "metadata": {
     "name": "abl_token",
     "version": "0.1.0",
@@ -108,6 +108,42 @@
           }
         },
         {
+          "name": "extra_metas_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  114,
+                  97,
+                  45,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  45,
+                  109,
+                  101,
+                  116,
+                  97,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         },
@@ -121,7 +157,7 @@
           "name": "args",
           "type": {
             "defined": {
-              "name": "InitializeMintArgs"
+              "name": "InitMintArgs"
             }
           }
         }
@@ -405,19 +441,7 @@
       }
     },
     {
-      "name": "InitWalletArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "allowed",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitializeMintArgs",
+      "name": "InitMintArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -448,6 +472,18 @@
           {
             "name": "threshold",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitWalletArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "allowed",
+            "type": "bool"
           }
         ]
       }
