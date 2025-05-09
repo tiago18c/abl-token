@@ -1,5 +1,5 @@
 {
-  "address": "JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H",
+  "address": "EYBRvArz4kb5YLtzjD4TW6DbWhS8qjcMYqBU4wHLW3qj",
   "metadata": {
     "name": "abl_token",
     "version": "0.1.0",
@@ -472,6 +472,18 @@
           {
             "name": "threshold",
             "type": "u64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
           }
         ]
       }

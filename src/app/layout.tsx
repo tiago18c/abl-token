@@ -13,7 +13,7 @@ const links: { label: string; path: string }[] = [
   // More links...
   { label: 'Home', path: '/' },
   { label: 'Account', path: '/account' },
-  { label: 'Basic Program', path: '/basic' },
+  { label: 'ABL Token Program', path: '/abl-token' },
 ]
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
