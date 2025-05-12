@@ -28,7 +28,7 @@ pub struct InitWallet<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl<'info> InitWallet<'info> {
+impl InitWallet<'_> {
     pub fn init_wallet(&mut self, args: InitWalletArgs) -> Result<()> {
         let ab_wallet = &mut self.ab_wallet;
         ab_wallet.wallet = self.wallet.key();

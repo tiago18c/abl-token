@@ -1,5 +1,13 @@
-use anchor_lang::{prelude::*, solana_program::program::invoke, solana_program::system_instruction::transfer};
-use anchor_spl::{token_2022::Token2022, token_interface::{spl_token_metadata_interface::state::Field, token_metadata_initialize, token_metadata_update_field, Mint, TokenMetadataInitialize, TokenMetadataUpdateField}};
+use anchor_lang::{
+    prelude::*, solana_program::program::invoke, solana_program::system_instruction::transfer,
+};
+use anchor_spl::{
+    token_2022::Token2022,
+    token_interface::{
+        spl_token_metadata_interface::state::Field, token_metadata_initialize,
+        token_metadata_update_field, Mint, TokenMetadataInitialize, TokenMetadataUpdateField,
+    },
+};
 
 use spl_tlv_account_resolution::{
     account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList,
@@ -40,7 +48,7 @@ pub struct InitMint<'info> {
         bump,
     )]
     pub config: Box<Account<'info, Config>>,
-    
+
     #[account(
         init,
         space = get_meta_list_size()?,
@@ -56,9 +64,8 @@ pub struct InitMint<'info> {
     pub token_program: Program<'info, Token2022>,
 }
 
-impl<'info> InitMint<'info> {
+impl InitMint<'_> {
     pub fn init_mint(&mut self, args: InitMintArgs, config_bump: u8) -> Result<()> {
-
         let config = &mut self.config;
         config.authority = self.mint.key();
         config.bump = config_bump;
@@ -66,7 +73,7 @@ impl<'info> InitMint<'info> {
         let seeds = &[b"config".as_ref(), &[self.config.bump]];
         let signer_seeds = &[&seeds[..]];
         //let cpi_program = self.token_program.to_account_info();
-        
+
         let cpi_accounts = TokenMetadataInitialize {
             program_id: self.token_program.to_account_info(),
             mint: self.mint.to_account_info(),
@@ -80,8 +87,7 @@ impl<'info> InitMint<'info> {
             signer_seeds,
         );
         token_metadata_initialize(cpi_ctx, args.name, args.symbol, args.uri)?;
-        
-        
+
         let cpi_accounts = TokenMetadataUpdateField {
             metadata: self.mint.to_account_info(),
             update_authority: self.config.to_account_info(),
@@ -94,14 +100,9 @@ impl<'info> InitMint<'info> {
             signer_seeds,
         );
 
-        token_metadata_update_field(
-            cpi_ctx,
-            Field::Key("AB".to_string()),
-            args.mode.to_string(),
-        )?;
+        token_metadata_update_field(cpi_ctx, Field::Key("AB".to_string()), args.mode.to_string())?;
 
         if args.mode == Mode::Mixed {
-            
             let cpi_accounts = TokenMetadataUpdateField {
                 metadata: self.mint.to_account_info(),
                 update_authority: self.config.to_account_info(),
@@ -112,7 +113,7 @@ impl<'info> InitMint<'info> {
                 cpi_accounts,
                 signer_seeds,
             );
-            
+
             token_metadata_update_field(
                 cpi_ctx,
                 Field::Key("threshold".to_string()),
@@ -124,11 +125,19 @@ impl<'info> InitMint<'info> {
         let min_balance = Rent::get()?.minimum_balance(data);
         if min_balance > self.mint.to_account_info().get_lamports() {
             invoke(
-                &transfer(&self.payer.key(), &self.mint.to_account_info().key(), min_balance - self.mint.to_account_info().get_lamports()),
-                &[self.payer.to_account_info(), self.mint.to_account_info(), self.system_program.to_account_info()],
+                &transfer(
+                    &self.payer.key(),
+                    &self.mint.to_account_info().key(),
+                    min_balance - self.mint.to_account_info().get_lamports(),
+                ),
+                &[
+                    self.payer.to_account_info(),
+                    self.mint.to_account_info(),
+                    self.system_program.to_account_info(),
+                ],
             )?;
         }
-        
+
         // initialize the extra metas account
         let extra_metas_account = &self.extra_metas_account;
         let metas = get_extra_account_metas()?;
@@ -152,7 +161,6 @@ pub struct InitMintArgs {
     pub uri: String,
 }
 
-
 fn get_meta_list_size() -> Result<usize> {
     Ok(ExtraAccountMetaList::size_of(1).unwrap())
 }
@@ -160,9 +168,19 @@ fn get_meta_list_size() -> Result<usize> {
 fn get_extra_account_metas() -> Result<Vec<ExtraAccountMeta>> {
     Ok(vec![
         // [5] ab_wallet for destination token account wallet
-        ExtraAccountMeta::new_with_seeds(&[
-            Seed::Literal { bytes: "ab_wallet".as_bytes().to_vec() },
-            Seed::AccountData { account_index: 2, data_index: 32, length: 32 }], false, true)?, // [2] destination token account
-        
+        ExtraAccountMeta::new_with_seeds(
+            &[
+                Seed::Literal {
+                    bytes: "ab_wallet".as_bytes().to_vec(),
+                },
+                Seed::AccountData {
+                    account_index: 2,
+                    data_index: 32,
+                    length: 32,
+                },
+            ],
+            false,
+            true,
+        )?, // [2] destination token account
     ])
 }

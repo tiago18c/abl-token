@@ -1,14 +1,13 @@
 use anchor_lang::prelude::*;
-use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 use spl_discriminator::SplDiscriminate;
+use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 
+pub mod errors;
 pub mod instructions;
 pub mod state;
-pub mod errors;
+pub use errors::*;
 pub use instructions::*;
 pub use state::*;
-pub use errors::*;
-
 
 declare_id!("JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H");
 
