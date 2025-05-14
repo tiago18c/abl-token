@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{ABWallet, Config};
+use crate::{ABWallet, Config, AB_WALLET_SEED, CONFIG_SEED};
 
 #[derive(Accounts)]
 pub struct InitWallet<'info> {
@@ -8,7 +8,7 @@ pub struct InitWallet<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        seeds = [b"config"],
+        seeds = [CONFIG_SEED],
         bump = config.bump,
         has_one = authority,
     )]
@@ -20,7 +20,7 @@ pub struct InitWallet<'info> {
         init,
         payer = authority,
         space = 8 + ABWallet::INIT_SPACE,
-        seeds = [b"ab_wallet", wallet.key().as_ref()],
+        seeds = [AB_WALLET_SEED, wallet.key().as_ref()],
         bump,
     )]
     pub ab_wallet: Account<'info, ABWallet>,

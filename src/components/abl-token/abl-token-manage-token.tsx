@@ -7,20 +7,16 @@ import { useAblTokenProgram } from './abl-token-data-access'
 import { AblTokenCreate, AblTokenProgram } from './abl-token-ui'
 import { AppHero } from '../app-hero'
 import { ellipsify } from '@/lib/utils'
-
+import ManageTokenInput from './abl-token-manage-token-input'
 export default function AblTokenFeature() {
   const { publicKey } = useWallet()
   const { programId } = useAblTokenProgram()
 
   return publicKey ? (
     <div>
-      <AppHero title="Manage Token" subtitle={'Run the program by clicking the "Run program" button.'}>
-        <p className="mb-6">
-          <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
-        </p>
-        <AblTokenCreate />
+      <AppHero title="Manage Token">
+        <ManageTokenInput />
       </AppHero>
-      <AblTokenProgram />
     </div>
   ) : (
     <div className="max-w-4xl mx-auto">

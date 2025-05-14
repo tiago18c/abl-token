@@ -13,8 +13,9 @@ const links: { label: string; path: string }[] = [
   // More links...
   { label: 'Home', path: '/' },
   { label: 'Account', path: '/account' },
-  { label: 'Manage Token', path: '/manage-token' },
+  { label: 'Config', path: '/config' },
   { label: 'Create New Token', path: '/create-token' },
+  { label: 'Manage Token', path: '/manage-token' },
 ]
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

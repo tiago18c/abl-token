@@ -42,4 +42,4 @@ solana-system-interface = "1.0.0"
 solana-transaction = "2.2.1"
 solana-message = "2.2.1"
 solana-sdk-ids = "2.2.1"
-spl-token-2022 = "8.0.1"
+spl-token-2022 = { version = "8.0.1", features = ["no-entrypoint"]}

@@ -1,34 +1,36 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, solana_program::system_instruction::transfer };
+use anchor_lang::solana_program::program::invoke;
 use anchor_spl::token_interface::spl_token_metadata_interface::state::TokenMetadata;
 use anchor_spl::{
     token_2022::{
         spl_token_2022::extension::{BaseStateWithExtensions, StateWithExtensions},
         spl_token_2022::state::Mint,
         Token2022,
+        
     },
     token_interface::{
+        Mint as MintAccount,
         spl_token_metadata_interface::state::Field, token_metadata_update_field,
         TokenMetadataUpdateField,
     },
 };
 
-use crate::{Config, Mode};
+use crate::{Config, Mode, CONFIG_SEED};
 
 #[derive(Accounts)]
 pub struct ChangeMode<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
-
+    
     #[account(
-        seeds = [b"config"],
-        bump = config.bump,
-        has_one = authority,
+        mut,
+        mint::token_program = token_program,
     )]
-    pub config: Box<Account<'info, Config>>,
-    /// CHECK:
-    pub mint: UncheckedAccount<'info>,
+    pub mint: InterfaceAccount<'info, MintAccount>,
 
     pub token_program: Program<'info, Token2022>,
+
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -41,13 +43,11 @@ impl ChangeMode<'_> {
     pub fn change_mode(&mut self, args: ChangeModeArgs) -> Result<()> {
         let cpi_accounts = TokenMetadataUpdateField {
             metadata: self.mint.to_account_info(),
-            update_authority: self.config.to_account_info(),
+            update_authority: self.authority.to_account_info(),
             program_id: self.token_program.to_account_info(),
         };
-        let seeds = &[b"config".as_ref(), &[self.config.bump]];
-        let signer_seeds = &[&seeds[..]];
         let cpi_program = self.token_program.to_account_info();
-        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
+        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
         token_metadata_update_field(cpi_ctx, Field::Key("AB".to_string()), args.mode.to_string())?;
 
@@ -60,7 +60,7 @@ impl ChangeMode<'_> {
 
             let cpi_accounts = TokenMetadataUpdateField {
                 metadata: self.mint.to_account_info(),
-                update_authority: self.config.to_account_info(),
+                update_authority: self.authority.to_account_info(),
                 program_id: self.token_program.to_account_info(),
             };
             let cpi_program = self.token_program.to_account_info();
@@ -70,6 +70,25 @@ impl ChangeMode<'_> {
                 cpi_ctx,
                 Field::Key("threshold".to_string()),
                 threshold.to_string(),
+            )?;
+        }
+
+        
+
+        let data = self.mint.to_account_info().data_len();
+        let min_balance = Rent::get()?.minimum_balance(data);
+        if min_balance > self.mint.to_account_info().get_lamports() {
+            invoke(
+                &transfer(
+                    &self.authority.key(),
+                    &self.mint.to_account_info().key(),
+                    min_balance - self.mint.to_account_info().get_lamports(),
+                ),
+                &[
+                    self.authority.to_account_info(),
+                    self.mint.to_account_info(),
+                    self.system_program.to_account_info(),
+                ],
             )?;
         }
 

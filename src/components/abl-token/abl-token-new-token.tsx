@@ -14,13 +14,12 @@ export default function AblTokenFeature() {
 
   return publicKey ? (
     <div>
-      <AppHero title="Create New Token" subtitle={'Run the program by clicking the "Run program" button.'}>
+      <AppHero title="Create New Token">
         <p className="mb-6">
           <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
         </p>
         <AblTokenCreate />
       </AppHero>
-      <AblTokenProgram />
     </div>
   ) : (
     <div className="max-w-4xl mx-auto">

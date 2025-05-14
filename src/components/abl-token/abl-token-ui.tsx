@@ -5,22 +5,186 @@ import { useAblTokenProgram } from './abl-token-data-access'
 import { Button } from '@/components/ui/button'
 import { BN } from '@coral-xyz/anchor'
 import React from 'react'
+import { useWallet } from '@solana/wallet-adapter-react'
 
 export function AblTokenCreate() {
+  
+  const { publicKey } = useWallet()
   const { initToken } = useAblTokenProgram()
+  const [mode, setMode] = React.useState<'allow' | 'block' | 'threshold'>('allow')
+  const [threshold, setThreshold] = React.useState('100000')
+  const [formData, setFormData] = React.useState({
+    mintAuthority: publicKey ? publicKey.toString() : '',
+    freezeAuthority: publicKey ? publicKey.toString() : '',
+    permanentDelegate: publicKey ? publicKey.toString() : '',
+    transferHookAuthority: publicKey ? publicKey.toString() : '',
+    name: '',
+    symbol: '',
+    uri: '',
+    decimals: '6'
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      initToken.mutateAsync({
+        decimals: parseInt(formData.decimals),
+        mintAuthority: new PublicKey(formData.mintAuthority),
+        freezeAuthority: new PublicKey(formData.freezeAuthority),
+        permanentDelegate: new PublicKey(formData.permanentDelegate),
+        transferHookAuthority: new PublicKey(formData.transferHookAuthority),
+        mode,
+        threshold: new BN(threshold),
+        name: formData.name,
+        symbol: formData.symbol,
+        uri: formData.uri
+      })
+    } catch (err) {
+      console.error('Invalid form data:', err)
+    }
+  }
 
   return (
-    <Button onClick={() => initToken.mutateAsync({
-      decimals: 6,
-      mintAuthority: new PublicKey(''),
-      freezeAuthority: new PublicKey(''),
-      permanentDelegate: new PublicKey(''),
-      mode: 'allow',
-      threshold: new BN(1),
-      name: 'ablToken'
-    })} disabled={initToken.isPending}>
-      Run program{initToken.isPending && '...'}
-    </Button>
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
+      <div className="space-y-2">
+        <label className="block">
+          Mint Authority*
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={formData.mintAuthority}
+            onChange={e => setFormData({...formData, mintAuthority: e.target.value})}
+            required
+          />
+        </label>
+
+        <label className="block">
+          Freeze Authority*
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={formData.freezeAuthority}
+            onChange={e => setFormData({...formData, freezeAuthority: e.target.value})}
+            required
+          />
+        </label>
+
+        <label className="block">
+          Permanent Delegate*
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={formData.permanentDelegate}
+            onChange={e => setFormData({...formData, permanentDelegate: e.target.value})}
+            required
+          />
+        </label>
+
+        <label className="block">
+          Transfer Hook Authority*
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={formData.transferHookAuthority}
+            onChange={e => setFormData({...formData, transferHookAuthority: e.target.value})}
+            required
+          />
+        </label>
+
+        <label className="block">
+          Name*
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={formData.name}
+            onChange={e => setFormData({...formData, name: e.target.value})}
+            required
+          />
+        </label>
+
+        <label className="block">
+          Symbol*
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={formData.symbol}
+            onChange={e => setFormData({...formData, symbol: e.target.value})}
+            required
+          />
+        </label>
+
+        <label className="block">
+          URI*
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={formData.uri}
+            onChange={e => setFormData({...formData, uri: e.target.value})}
+            required
+          />
+        </label>
+
+        <label className="block">
+          Decimals*
+          <input
+            type="number"
+            className="w-full p-2 border rounded"
+            value={formData.decimals}
+            onChange={e => setFormData({...formData, decimals: e.target.value})}
+            required
+            min="0"
+            max="9"
+          />
+        </label>
+
+        <div className="space-y-2">
+          <label className="block">Mode*</label>
+          <div className="flex gap-4">
+            <label>
+              <input
+                type="radio"
+                checked={mode === 'allow'}
+                onChange={() => setMode('allow')}
+                name="mode"
+              /> Allow
+            </label>
+            <label>
+              <input
+                type="radio"
+                checked={mode === 'block'}
+                onChange={() => setMode('block')}
+                name="mode"
+              /> Block
+            </label>
+            <label>
+              <input
+                type="radio"
+                checked={mode === 'threshold'}
+                onChange={() => setMode('threshold')}
+                name="mode"
+              /> Threshold
+            </label>
+          </div>
+        </div>
+
+        {mode === 'threshold' && (
+          <label className="block">
+            Threshold Amount
+            <input
+              type="number"
+              className="w-full p-2 border rounded"
+              value={threshold}
+              onChange={e => setThreshold(e.target.value)}
+              min="0"
+            />
+          </label>
+        )}
+      </div>
+
+      <Button type="submit" disabled={initToken.isPending}>
+        Create Token {initToken.isPending && '...'}
+      </Button>
+    </form>
   )
 }
 

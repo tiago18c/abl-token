@@ -1,5 +1,5 @@
-import AccountListFeature from '@/components/account/account-list-feature'
+import AblTokenManageToken from '@/components/abl-token/abl-token-manage-token'
 
 export default function Page() {
-  return <AccountListFeature />
+  return <AblTokenManageToken />
 }

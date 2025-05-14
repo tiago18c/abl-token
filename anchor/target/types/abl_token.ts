@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/abl_token.json`.
  */
 export type AblToken = {
-  "address": "JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H",
+  "address": "LtkoMwPSKxAE714EY3V1oAEQ5LciqJcRwQQuQnzEhQQ",
   "metadata": {
     "name": "ablToken",
     "version": "0.1.0",
@@ -13,6 +13,92 @@ export type AblToken = {
     "description": "Created with Anchor"
   },
   "instructions": [
+    {
+      "name": "attachToMint",
+      "discriminator": [
+        203,
+        132,
+        125,
+        16,
+        50,
+        249,
+        174,
+        252
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mintAuthority",
+          "signer": true
+        },
+        {
+          "name": "metadataAuthority",
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "extraMetasAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  114,
+                  97,
+                  45,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  45,
+                  109,
+                  101,
+                  116,
+                  97,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "attachToMintArgs"
+            }
+          }
+        }
+      ]
+    },
     {
       "name": "changeMode",
       "discriminator": [
@@ -29,13 +115,53 @@ export type AblToken = {
         {
           "name": "authority",
           "writable": true,
-          "signer": true,
-          "relations": [
-            "config"
-          ]
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "changeModeArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "initConfig",
+      "discriminator": [
+        23,
+        235,
+        115,
+        232,
+        168,
+        96,
+        1,
+        231
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
         },
         {
           "name": "config",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -53,23 +179,11 @@ export type AblToken = {
           }
         },
         {
-          "name": "mint"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "changeModeArgs"
-            }
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "initMint",
@@ -93,25 +207,6 @@ export type AblToken = {
           "name": "mint",
           "writable": true,
           "signer": true
-        },
-        {
-          "name": "config",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
         },
         {
           "name": "extraMetasAccount",
@@ -411,6 +506,44 @@ export type AblToken = {
       }
     },
     {
+      "name": "attachToMintArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "symbol",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "uri",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "mode",
+            "type": {
+              "defined": {
+                "name": "mode"
+              }
+            }
+          },
+          {
+            "name": "threshold",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "changeModeArgs",
       "type": {
         "kind": "struct",
@@ -465,6 +598,10 @@ export type AblToken = {
           },
           {
             "name": "permanentDelegate",
+            "type": "pubkey"
+          },
+          {
+            "name": "transferHookAuthority",
             "type": "pubkey"
           },
           {
