@@ -1,9 +1,9 @@
 use {
     anchor_lang::ToAccountMetas, anchor_lang::InstructionData, solana_message::Message,
-    abl_token::{accounts::InitMint, instructions::InitMintArgs, Mode}, litesvm::LiteSVM, solana_instruction::Instruction, solana_keypair::Keypair, solana_native_token::LAMPORTS_PER_SOL, solana_pubkey::{pubkey, Pubkey}, solana_sdk_ids::system_program::ID as SYSTEM_PROGRAM_ID, solana_signer::Signer, solana_transaction::Transaction, spl_token_2022::ID as TOKEN_22_PROGRAM_ID, std::path::PathBuf
+    abl_token::{accounts::InitMint, accounts::InitConfig, instructions::InitMintArgs, Mode}, litesvm::LiteSVM, solana_instruction::Instruction, solana_keypair::Keypair, solana_native_token::LAMPORTS_PER_SOL, solana_pubkey::{pubkey, Pubkey}, solana_sdk_ids::system_program::ID as SYSTEM_PROGRAM_ID, solana_signer::Signer, solana_transaction::Transaction, spl_token_2022::ID as TOKEN_22_PROGRAM_ID, std::path::PathBuf
 };
 
-const PROGRAM_ID: Pubkey = pubkey!("JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H");
+const PROGRAM_ID: Pubkey = abl_token::ID_CONST;
 
 fn setup() -> (LiteSVM, Keypair) {
     let mut svm = LiteSVM::new();
@@ -13,7 +13,6 @@ fn setup() -> (LiteSVM, Keypair) {
     svm.airdrop(&admin_pk, 10000 * LAMPORTS_PER_SOL).unwrap();
 
 
-    let program_id = pubkey!("JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H");
     let mut so_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     so_path.push("../../target/deploy/abl_token.so");
 
@@ -21,7 +20,7 @@ fn setup() -> (LiteSVM, Keypair) {
     
     let bytecode = std::fs::read(so_path).unwrap();
 
-    svm.add_program(program_id, &bytecode);
+    svm.add_program(PROGRAM_ID, &bytecode);
 
     (svm, admin_kp)
 }
@@ -37,6 +36,26 @@ fn test() {
     let config = derive_config();
     let meta_list = derive_meta_list(&mint_pk);
 
+    let init_cfg_ix = abl_token::instruction::InitConfig {   };
+
+    let init_cfg_accounts = InitConfig {
+        payer: admin_pk,
+        config: config,
+        system_program: SYSTEM_PROGRAM_ID,
+    };
+
+    let accs = init_cfg_accounts.to_account_metas(None);
+
+    let instruction = Instruction {
+        program_id: PROGRAM_ID,
+        accounts: accs,
+        data: init_cfg_ix.data(),
+    };
+    let msg = Message::new(&[instruction], Some(&admin_pk));
+    let tx = Transaction::new(&[&admin_kp], msg, svm.latest_blockhash());
+
+    svm.send_transaction(tx).unwrap();
+
     let args: InitMintArgs = InitMintArgs {
         name: "Test".to_string(),
         symbol: "TEST".to_string(),
@@ -45,6 +64,7 @@ fn test() {
         mint_authority: mint_pk,
         freeze_authority: mint_pk,
         permanent_delegate: mint_pk,
+        transfer_hook_authority: admin_pk,
         mode: Mode::Mixed,
         threshold: 100000,
     };
@@ -57,7 +77,6 @@ fn test() {
     let init_mint_accounts = InitMint {
         payer: admin_pk,
         mint: mint_pk,
-        config: config,
         extra_metas_account: meta_list,
         system_program: SYSTEM_PROGRAM_ID,
         token_program: TOKEN_22_PROGRAM_ID,
@@ -74,6 +93,8 @@ fn test() {
     let tx = Transaction::new(&[&admin_kp, &mint_kp], msg, svm.latest_blockhash());
 
     let _res = svm.send_transaction(tx).unwrap();
+
+    
 
 }
 

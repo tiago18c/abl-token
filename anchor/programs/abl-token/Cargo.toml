@@ -19,7 +19,10 @@ idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 
 [dependencies]
 anchor-lang = { version = "0.31.1", features = ["interface-instructions"] }
-anchor-spl = { version = "0.31.1", features = ["token_2022_extensions", "token_2022"] }
+anchor-spl = { version = "0.31.1", features = [
+    "token_2022_extensions",
+    "token_2022",
+] }
 
 
 spl-tlv-account-resolution = "0.8.1"
@@ -39,4 +42,4 @@ solana-system-interface = "1.0.0"
 solana-transaction = "2.2.1"
 solana-message = "2.2.1"
 solana-sdk-ids = "2.2.1"
-spl-token-2022 = "8.0.1"
+spl-token-2022 = { version = "8.0.1", features = ["no-entrypoint"]}

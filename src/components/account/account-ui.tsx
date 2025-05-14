@@ -13,6 +13,7 @@ import {
   useGetSignatures,
   useGetTokenAccounts,
   useRequestAirdrop,
+  useSendTokens,
   useTransferSol,
 } from './account-data-access'
 import { ellipsify } from '@/lib/utils'
@@ -82,6 +83,7 @@ export function AccountTokens({ address }: { address: PublicKey }) {
   const [showAll, setShowAll] = useState(false)
   const query = useGetTokenAccounts({ address })
   const client = useQueryClient()
+  const sendTokens = useSendTokens()
   const items = useMemo(() => {
     if (showAll) return query.data
     return query.data?.slice(0, 5)
@@ -123,6 +125,7 @@ export function AccountTokens({ address }: { address: PublicKey }) {
                   <TableHead>Public Key</TableHead>
                   <TableHead>Mint</TableHead>
                   <TableHead className="text-right">Balance</TableHead>
+                  <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -147,6 +150,29 @@ export function AccountTokens({ address }: { address: PublicKey }) {
                     </TableCell>
                     <TableCell className="text-right">
                       <span className="font-mono">{account.data.parsed.info.tokenAmount.uiAmount}</span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="font-mono">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const amount = window.prompt("Enter amount to send:")
+                          const destination = window.prompt("Enter destination wallet address:")
+                          if (amount && destination) {
+                            try {
+                              sendTokens.mutateAsync({ mint: new PublicKey(account.data.parsed.info.mint), destination: new PublicKey(destination), amount: parseFloat(amount) });
+                              // TODO: Implement token transfer logic
+                              console.log(`Sending ${amount} tokens to ${destination}`)
+                            } catch (err) {
+                              console.error("Failed to send tokens:", err)
+                            }
+                          }
+                        }}
+                      >
+                        Send
+                      </Button>
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}

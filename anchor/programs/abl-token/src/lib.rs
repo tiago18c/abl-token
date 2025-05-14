@@ -1,16 +1,19 @@
 use anchor_lang::prelude::*;
-use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 use spl_discriminator::SplDiscriminate;
+use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 
+pub mod errors;
 pub mod instructions;
 pub mod state;
-pub mod errors;
+pub mod constants;
+pub mod utils;
+pub use errors::*;
 pub use instructions::*;
 pub use state::*;
-pub use errors::*;
+pub use constants::*;
+pub use utils::*;
 
-
-declare_id!("JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H");
+declare_id!("LtkoMwPSKxAE714EY3V1oAEQ5LciqJcRwQQuQnzEhQQ");
 
 #[program]
 pub mod abl_token {
@@ -18,7 +21,15 @@ pub mod abl_token {
     use super::*;
 
     pub fn init_mint(ctx: Context<InitMint>, args: InitMintArgs) -> Result<()> {
-        ctx.accounts.init_mint(args, ctx.bumps.config)
+        ctx.accounts.init_mint(args)
+    }
+
+    pub fn init_config(ctx: Context<InitConfig>) -> Result<()> {
+        ctx.accounts.init_config(ctx.bumps.config)
+    }
+
+    pub fn attach_to_mint(ctx: Context<AttachToMint>, args: AttachToMintArgs) -> Result<()> {
+        ctx.accounts.attach_to_mint(args)
     }
 
     #[instruction(discriminator = ExecuteInstruction::SPL_DISCRIMINATOR_SLICE)]

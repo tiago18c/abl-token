@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-abl-token = "JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H"
+abl-token = "LtkoMwPSKxAE714EY3V1oAEQ5LciqJcRwQQuQnzEhQQ"
 
 [registry]
 url = "https://api.apr.dev"

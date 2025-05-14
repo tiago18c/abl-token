@@ -1,58 +1,56 @@
 use std::str::FromStr;
 
 use anchor_lang::prelude::*;
-use anchor_spl::{token_2022::spl_token_2022::{extension::{BaseStateWithExtensions, StateWithExtensions}, state::Mint}, token_interface::spl_token_metadata_interface::state::TokenMetadata};
+use anchor_spl::{
+    token_2022::spl_token_2022::{
+        extension::{BaseStateWithExtensions, StateWithExtensions},
+        state::Mint,
+    },
+    token_interface::spl_token_metadata_interface::state::TokenMetadata,
+};
 
 use crate::{ABListError, ABWallet, Mode};
 
 #[derive(Accounts)]
 pub struct TxHook<'info> {
-    /// CHECK: 
+    /// CHECK:
     pub source_token_account: UncheckedAccount<'info>,
-    /// CHECK: 
+    /// CHECK:
     pub mint: UncheckedAccount<'info>,
-    /// CHECK: 
+    /// CHECK:
     pub destination_token_account: UncheckedAccount<'info>,
-    /// CHECK: 
+    /// CHECK:
     pub owner_delegate: UncheckedAccount<'info>,
-    /// CHECK: 
+    /// CHECK:
     pub meta_list: UncheckedAccount<'info>,
-    /// CHECK: 
+    /// CHECK:
     pub ab_wallet: UncheckedAccount<'info>,
 }
 
-impl<'info> TxHook<'info> {
+impl TxHook<'_> {
     pub fn tx_hook(&self, amount: u64) -> Result<()> {
         let mint_info = self.mint.to_account_info();
         let mint_data = mint_info.data.borrow();
         let mint = StateWithExtensions::<Mint>::unpack(&mint_data)?;
-        
+
         let metadata = mint.get_variable_len_extension::<TokenMetadata>()?;
         let decoded_mode = Self::decode_metadata(&metadata)?;
-        let decoded_wallet_mode = Self::decode_wallet_mode(&self)?;
+        let decoded_wallet_mode = self.decode_wallet_mode()?;
 
         match (decoded_mode, decoded_wallet_mode) {
             // first check the force allow modes
-            (DecodedMintMode::Allow, DecodedWalletMode::Allow) => {
-                return Ok(());
-            }
-            (DecodedMintMode::Allow, _) => {
-                return Err(ABListError::WalletNotAllowed.into());
-            }
+            (DecodedMintMode::Allow, DecodedWalletMode::Allow) => Ok(()),
+            (DecodedMintMode::Allow, _) => Err(ABListError::WalletNotAllowed.into()),
             // then check if the wallet is blocked
-            (_, DecodedWalletMode::Block) => {
-                return Err(ABListError::WalletBlocked.into());
-            }
-            (DecodedMintMode::Block, _) => {
-                return Ok(());
-            }
+            (_, DecodedWalletMode::Block) => Err(ABListError::WalletBlocked.into()),
+            (DecodedMintMode::Block, _) => Ok(()),
             // lastly check the threshold mode
-            (DecodedMintMode::Threshold(threshold), DecodedWalletMode::None) if amount >= threshold => {
-                return Err(ABListError::AmountNotAllowed.into());
+            (DecodedMintMode::Threshold(threshold), DecodedWalletMode::None)
+                if amount >= threshold =>
+            {
+                Err(ABListError::AmountNotAllowed.into())
             }
-            (DecodedMintMode::Threshold(_), _) => {
-                return Ok(());
-            }
+            (DecodedMintMode::Threshold(_), _) => Ok(()),
         }
     }
 
@@ -63,11 +61,11 @@ impl<'info> TxHook<'info> {
 
         let wallet_data = &mut self.ab_wallet.data.borrow();
         let wallet = ABWallet::try_deserialize(&mut &wallet_data[..])?;
-        
+
         if wallet.allowed {
-            return Ok(DecodedWalletMode::Allow);
+            Ok(DecodedWalletMode::Allow)
         } else {
-            return Ok(DecodedWalletMode::Block);
+            Ok(DecodedWalletMode::Block)
         }
     }
 
@@ -103,7 +101,7 @@ impl<'info> TxHook<'info> {
         } else if mode == Mode::Block {
             return Ok(DecodedMintMode::Block);
         }
-        
+
         Ok(DecodedMintMode::Threshold(threshold))
     }
 }
@@ -111,11 +109,11 @@ impl<'info> TxHook<'info> {
 enum DecodedMintMode {
     Allow,
     Block,
-    Threshold(u64)
+    Threshold(u64),
 }
 
 enum DecodedWalletMode {
     Allow,
     Block,
-    None
+    None,
 }

@@ -23,7 +23,7 @@ pub struct RemoveWallet<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl<'info> RemoveWallet<'info> {
+impl RemoveWallet<'_> {
     pub fn remove_wallet(&mut self) -> Result<()> {
         Ok(())
     }

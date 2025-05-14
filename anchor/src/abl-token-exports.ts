@@ -27,3 +27,5 @@ export function getABLTokenProgramId(cluster: Cluster) {
       return ABL_TOKEN_PROGRAM_ID
   }
 }
+
+//ABLTokenIDL.types["mode"]
