@@ -1,12 +1,11 @@
 'use client'
 
-import { createAssociatedTokenAccountIdempotentInstruction, createTransferCheckedInstruction, createTransferCheckedWithTransferHookInstruction, getAssociatedTokenAddressSync, getExtraAccountMetaAddress, getExtraAccountMetas, getMint, getTransferHook, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { createAssociatedTokenAccountIdempotentInstruction, createTransferCheckedInstruction, getAssociatedTokenAddressSync, getExtraAccountMetaAddress, getExtraAccountMetas, getMint, getTransferHook, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import {
   Connection,
   LAMPORTS_PER_SOL,
   PublicKey,
-  SendTransactionError,
   SystemProgram,
   Transaction,
   TransactionMessage,
@@ -16,7 +15,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTransactionErrorToast, useTransactionToast } from '../use-transaction-toast'
 import { useAnchorProvider } from '../solana/solana-provider'
-import { toast } from 'sonner'
 import { Buffer } from "buffer"
 
 export function useGetBalance({ address }: { address: PublicKey }) {
@@ -96,7 +94,7 @@ export function useSendTokens() {
       transaction.feePayer = provider.wallet.publicKey;
       transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 
-      let signedTx = await provider.wallet.signTransaction(transaction);
+      const signedTx = await provider.wallet.signTransaction(transaction);
 
       return connection.sendRawTransaction(signedTx.serialize());
     },

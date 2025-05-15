@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/abl_token.json`.
  */
 export type AblToken = {
-  "address": "LtkoMwPSKxAE714EY3V1oAEQ5LciqJcRwQQuQnzEhQQ",
+  "address": "EYBRvArz4kb5YLtzjD4TW6DbWhS8qjcMYqBU4wHLW3qj",
   "metadata": {
     "name": "ablToken",
     "version": "0.1.0",
@@ -29,14 +29,6 @@ export type AblToken = {
         {
           "name": "payer",
           "writable": true,
-          "signer": true
-        },
-        {
-          "name": "mintAuthority",
-          "signer": true
-        },
-        {
-          "name": "metadataAuthority",
           "signer": true
         },
         {
@@ -88,16 +80,7 @@ export type AblToken = {
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "attachToMintArgs"
-            }
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "changeMode",
@@ -501,44 +484,6 @@ export type AblToken = {
           {
             "name": "allowed",
             "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "attachToMintArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "symbol",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "uri",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "mode",
-            "type": {
-              "defined": {
-                "name": "mode"
-              }
-            }
-          },
-          {
-            "name": "threshold",
-            "type": "u64"
           }
         ]
       }
