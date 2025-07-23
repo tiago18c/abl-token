@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/abl_token.json`.
  */
 export type AblToken = {
-  "address": "EYBRvArz4kb5YLtzjD4TW6DbWhS8qjcMYqBU4wHLW3qj",
+  "address": "LtkoMwPSKxAE714EY3V1oAEQ5LciqJcRwQQuQnzEhQQ",
   "metadata": {
     "name": "ablToken",
     "version": "0.1.0",

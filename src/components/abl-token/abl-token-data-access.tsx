@@ -27,7 +27,7 @@ export function useHasTransferHookEnabled(mint: PublicKey) {
         TOKEN_2022_PROGRAM_ID,
         );
       const transferHook = getTransferHook(mintInfo);
-      return transferHook !== null && transferHook.programId === programId;
+      return transferHook !== null && programId.equals(transferHook.programId);
     },
   })
 }
@@ -54,7 +54,7 @@ export function useGetToken(mint: PublicKey) {
       TOKEN_2022_PROGRAM_ID,
     );
 
-    const mode = metadata?.additionalMetadata.find((metadata) => metadata[0] === "mode")?.[1] || null;
+    const mode = metadata?.additionalMetadata.find((metadata) => metadata[0] === "AB")?.[1] || null;
     const threshold = metadata?.additionalMetadata.find((metadata) => metadata[0] === "threshold")?.[1] || null;
 
     const permanentDelegate = await getPermanentDelegate(mintInfo);
@@ -65,8 +65,6 @@ export function useGetToken(mint: PublicKey) {
     const isTransferHookSet = transferHook?.programId?.equals(programId) || false;
     const transferHookProgramId = transferHook?.programId || null;
 
-    console.log(isTransferHookEnabled, isTransferHookSet, transferHookProgramId?.toString());
-
     return {
       name: metadata?.name,
       symbol: metadata?.symbol,
@@ -75,7 +73,7 @@ export function useGetToken(mint: PublicKey) {
       supply: mintInfo.supply,
       mintAuthority: mintInfo.mintAuthority,
       freezeAuthority: mintInfo.freezeAuthority,
-      permanentDelegate: permanentDelegate,
+      permanentDelegate: permanentDelegate?.delegate ?? null,
       isTransferHookEnabled,
       isTransferHookSet,
       transferHookProgramId,
@@ -161,7 +159,7 @@ export function useAblTokenProgram() {
       threshold: BN,
       mint: PublicKey,
     }) => {
-      const modeEnum = args.mode === 'allow' ? { allow: {} } : args.mode === 'block' ? { block: {}} : { mixed: {}}
+      const modeEnum = args.mode === 'Allow' ? { allow: {} } : args.mode === 'Block' ? { block: {}} : { mixed: {}}
       return program.methods.changeMode({
         mode: modeEnum,
         threshold: args.threshold,

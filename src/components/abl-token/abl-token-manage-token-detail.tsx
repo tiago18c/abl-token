@@ -19,7 +19,7 @@ interface TokenInfo {
   supply: number;
   mintAuthority: PublicKey | null;
   freezeAuthority: PublicKey | null;
-  permanentDelegate: PermanentDelegate | null;
+  permanentDelegate: PublicKey | null;
   mode: string | null;
   threshold: string | null;
   transferHookProgramId: PublicKey | null;
@@ -41,18 +41,22 @@ function TokenInfo({ tokenAddress }: { tokenAddress: string }) {
           <div>Decimals: {tokenInfo.data?.decimals}</div>
           <div>URI: {tokenInfo.data?.uri}</div>
           <div>Supply: {tokenInfo.data?.supply}</div>
-          <div>Mode: {tokenInfo.data?.mode}</div>
-          <div>Threshold: {tokenInfo.data?.threshold?.toString()}</div>
-          {tokenInfo.data?.isTransferHookEnabled ? (tokenInfo.data?.isTransferHookSet ? (
-            <div>TxHook: Enabled and Set ✅</div>
-          ) : (
-            <div>TxHook: Enabled. <Button onClick={() => attachToExistingToken.mutateAsync({ mint: new PublicKey(tokenAddress) }).then()}>Set</Button></div>
-          )) : (
-            <div>TxHook: Not enabled ❌</div>
-          )}
           <div>Mint Authority: {tokenInfo.data?.mintAuthority?.toString()}</div>
           <div>Freeze Authority: {tokenInfo.data?.freezeAuthority?.toString()}</div>
           <div>Permanent Delegate: {tokenInfo.data?.permanentDelegate?.toString()}</div>
+          <br/>
+          <div>
+            <h3 className="text-xl font-bold mb-2">ABL Token</h3>
+            <div>Mode: {tokenInfo.data?.mode}</div>
+            <div>Threshold: {tokenInfo.data?.threshold?.toString()}</div>
+            {tokenInfo.data?.isTransferHookEnabled ? (tokenInfo.data?.isTransferHookSet ? (
+              <div>TxHook: Enabled and Set ✅</div>
+            ) : (
+              <div>TxHook: Enabled. <Button onClick={() => attachToExistingToken.mutateAsync({ mint: new PublicKey(tokenAddress) }).then()}>Set</Button></div>
+            )) : (
+              <div>TxHook: Not enabled ❌</div>
+            )}
+          </div>
         </div>
       ) : (
         <p>No token information available.</p>
@@ -64,10 +68,9 @@ function TokenInfo({ tokenAddress }: { tokenAddress: string }) {
 function TokenManagement({ tokenInfo }: { tokenInfo: TokenInfo }) {
   const { publicKey } = useWallet()
   const { changeMode, mintTo } = useAblTokenProgram()
-  const [mode, setMode] = React.useState<'allow' | 'block' | 'mixed'>('allow')
-  const [threshold, setThreshold] = React.useState('100000')
+  const [mode, setMode] = React.useState<'Allow' | 'Block' | 'Mixed'>(tokenInfo.mode as 'Allow' | 'Block' | 'Mixed')
+  const [threshold, setThreshold] = React.useState(tokenInfo.threshold as string)
   const [destinationWallet, setDestinationWallet] = React.useState('')
-
 
   const handleApplyChanges = async () => {
     if (!publicKey || !tokenInfo) return;
@@ -112,30 +115,30 @@ function TokenManagement({ tokenInfo }: { tokenInfo: TokenInfo }) {
                 <label>
                   <input
                     type="radio"
-                    checked={mode === 'allow'}
-                    onChange={() => setMode('allow')}
+                    checked={mode === 'Allow'}
+                    onChange={() => setMode('Allow')}
                     name="mode"
                   /> Allow
                 </label>
                 <label>
                   <input
                     type="radio"
-                    checked={mode === 'block'}
-                    onChange={() => setMode('block')}
+                    checked={mode === 'Block'}
+                    onChange={() => setMode('Block')}
                     name="mode"
                   /> Block
                 </label>
                 <label>
                   <input
                     type="radio"
-                    checked={mode === 'mixed'}
-                    onChange={() => setMode('mixed')}
+                    checked={mode === 'Mixed'}
+                    onChange={() => setMode('Mixed')}
                     name="mode"
                   /> Mixed
                 </label>
               </div>
 
-              {mode === 'mixed' && (
+              {mode === 'Mixed' && (
               <div>
                 <label className="block mb-2">Threshold Amount</label>
                 <input
@@ -149,7 +152,10 @@ function TokenManagement({ tokenInfo }: { tokenInfo: TokenInfo }) {
               )}
 
               <div className="mt-4">
-                <Button onClick={handleApplyChanges}>
+                <Button 
+                  onClick={handleApplyChanges}
+                  disabled={mode === tokenInfo.mode && threshold === tokenInfo.threshold}
+                >
                   Apply Changes
                 </Button>
               </div>
